@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quiz de História - 4º Ano</title>
+<style>
+:root{--green:#74c52f;--dark:#0b4a3e;--blue:#153e77;--cream:#fff8dc;--orange:#f4a62a;--paper:#fffdf2;}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(#a9e341,#63c833 50%,#178352);color:#18332b;min-height:100vh}
+.wrap{max-width:860px;margin:auto;padding:18px}
+.hero{background:var(--paper);border:4px solid #fff;border-radius:28px;padding:18px;box-shadow:0 8px 0 rgba(0,0,0,.08);position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;width:230px;height:230px;border-radius:50%;background:#0f7c45;top:-120px;left:-70px;opacity:.18}
+.tag{display:inline-block;background:#fff;padding:7px 12px;border-radius:10px;font-weight:800;box-shadow:0 3px 0 rgba(0,0,0,.12);margin-right:6px}
+.grade{float:right;background:#fff;border-radius:18px;padding:10px 15px;text-align:center;font-weight:900;color:#111;border-bottom:16px solid #233b91}
+h1{clear:both;font-size:clamp(32px,8vw,70px);line-height:.9;margin:28px 0 8px;color:#0f5a42;text-shadow:2px 3px #e9f0c8}
+.sub{font-weight:800;background:#f6ae2d;display:inline-block;padding:8px 12px;border-radius:12px}
+.card{margin-top:16px;background:rgba(255,253,242,.97);border-radius:24px;padding:20px;box-shadow:0 8px 0 rgba(0,0,0,.08)}
+button{font:inherit}
+.primary{width:100%;border:0;border-radius:18px;background:#13843c;color:#fff;font-weight:900;font-size:24px;padding:16px;cursor:pointer}
+.primary:disabled{opacity:.5;cursor:not-allowed}
+.secondary{border:2px solid #cfd8c2;background:#fff;border-radius:14px;padding:12px 14px;font-weight:800;cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#edf7e4;border-radius:14px;padding:10px;text-align:center}
+.stat b{font-size:22px;color:var(--dark)}
+.progressbar{height:12px;background:#e4eadb;border-radius:99px;overflow:hidden;margin:10px 0 18px}
+.progressbar i{display:block;height:100%;background:#f6ae2d;width:0%}
+.q{font-size:clamp(20px,4.8vw,30px);font-weight:900;margin:8px 0 16px}
+.options{display:grid;gap:10px}
+.option{width:100%;text-align:left;border:2px solid #dfe5d8;background:#fff;border-radius:16px;padding:14px;cursor:pointer;font-weight:700}
+.option.correct{background:#daf3d5;border-color:#33984a}
+.option.wrong{background:#ffe2dc;border-color:#c95747}
+.feedback{min-height:28px;font-weight:800;margin-top:12px}
+.hidden{display:none}
+.result-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.big{font-size:42px;font-weight:900}
+.ok{color:#14733a}.bad{color:#b24435}
+.footer{text-align:center;color:#f5ffe9;font-weight:700;padding:18px 0}
+.namebox{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+input{flex:1;min-width:180px;border:2px solid #d7dfcf;border-radius:13px;padding:12px;font-size:16px}
+@media(max-width:560px){.stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:1/-1}.grade{float:none;display:inline-block;margin-top:8px}.result-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+<span class="tag">ENSINO FUNDAMENTAL</span><span class="tag">HISTÓRIA</span>
+<div class="grade">4º<br><span style="font-size:16px">ANO</span></div>
+<h1>QUIZ DE<br>HISTÓRIA</h1>
+<div class="sub">Comércio no passado e na atualidade</div>
+<p style="max-width:640px;font-size:18px">Revise o conteúdo do livro respondendo às perguntas. No final, veja quantas você acertou e quantas errou.</p>
+<div class="namebox"><input id="name" placeholder="Nome do aluno (opcional)"><button class="secondary" id="shuffleBtn">Embaralhar perguntas</button></div>
+<button class="primary" id="startBtn">▶ INICIAR QUIZ</button>
+</section>
+<section id="quiz" class="card hidden">
+<div class="stats"><div class="stat">Pergunta<br><b id="num">1</b></div><div class="stat">Acertos<br><b id="hits">0</b></div><div class="stat">Erros<br><b id="misses">0</b></div></div>
+<div class="progressbar"><i id="bar"></i></div><div class="q" id="q"></div><div id="opts" class="options"></div><div id="feedback" class="feedback"></div>
+<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="primary" id="nextBtn" disabled style="font-size:18px;flex:1">PRÓXIMA</button><button class="secondary" id="restartBtn">Recomeçar</button></div>
+</section>
+<section id="result" class="card hidden"><h2 style="margin-top:0">Resultado final</h2><p id="studentLine"></p><div class="result-grid"><div class="stat"><div class="big ok" id="finalHits">0</div><b>ACERTOS</b></div><div class="stat"><div class="big bad" id="finalMisses">0</div><b>ERROS</b></div></div><div class="stat" style="margin-top:12px"><div class="big" id="finalPercent">0%</div><b>APROVEITAMENTO</b></div><p id="finalMsg" style="font-size:18px;font-weight:800"></p><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="primary" id="againBtn" style="font-size:18px;flex:1">FAZER NOVAMENTE</button><button class="secondary" id="wrongOnlyBtn">Refazer só as erradas</button></div></section>
+<div class="footer">4º ano • História • Revisão para a prova</div></div>
+<script>
+const ALL=[
+{q:'O que era o escambo?',o:['Uma compra feita pela internet','Uma troca de produtos ou trabalho sem usar dinheiro','Um imposto cobrado por Portugal','Uma moeda usada pelos indígenas'],a:1},
+{q:'Por que o pau-brasil era muito valorizado pelos portugueses?',o:['Porque produzia frutos','Porque sua madeira produzia uma tinta vermelha muito procurada na Europa','Porque servia somente para construir casas','Porque era utilizado como alimento'],a:1},
+{q:'No início da exploração do pau-brasil, o que os portugueses ofereciam aos indígenas em troca de seu trabalho?',o:['Espelhos, facas e machados','Moedas de ouro','Açúcar e café','Terras e casas'],a:0},
+{q:'Por que podemos dizer que essa troca entre portugueses e indígenas era desigual?',o:['Porque os indígenas não trabalhavam','Porque os objetos oferecidos valiam muito menos do que o pau-brasil levado à Europa','Porque não existia pau-brasil','Porque Portugal não levava madeira para a Europa'],a:1},
+{q:'Depois do pau-brasil, qual produto se tornou uma das principais riquezas da colônia?',o:['Café','Milho','Açúcar','Arroz'],a:2},
+{q:'Por que o Brasil apresentava boas condições para o cultivo da cana-de-açúcar?',o:['Clima frio e seco','Clima quente e úmido e solo adequado','Neve frequente','Pouca água'],a:1},
+{q:'O que eram os engenhos?',o:['Lugares onde o açúcar era produzido','Navios portugueses','Mercados indígenas','Lojas que vendiam ferramentas'],a:0},
+{q:'Como a cana e o açúcar eram transportados no período colonial?',o:['Somente por aviões','Por trilhas, mulas, barcos e depois navios','Somente por trens','Somente a pé'],a:1},
+{q:'Qual era a participação dos holandeses no comércio do açúcar?',o:['Plantavam toda a cana no Brasil','Transportavam, refinavam e vendiam o açúcar na Europa','Trabalhavam nos engenhos','Produziam pau-brasil'],a:1},
+{q:'Quem realizava grande parte do trabalho forçado nas plantações e nos engenhos?',o:['Reis europeus','Africanos escravizados, além de indígenas submetidos ao trabalho forçado','Somente comerciantes','Somente holandeses'],a:1},
+{q:'Para quem ficava a maior parte dos lucros do comércio do açúcar?',o:['Para os trabalhadores escravizados','Para Portugal e Holanda','Para os povos indígenas','Para os mascates'],a:1},
+{q:'O que era um mascate?',o:['Um vendedor viajante','Um tipo de moeda','Um navio','Um engenho'],a:0},
+{q:'O pau-brasil era valorizado na Europa.',o:['Verdadeiro','Falso','Somente no Brasil','Não havia comércio'],a:0},
+{q:'Antes das moedas, quais itens foram usados como forma de pagamento?',o:['Sal e conchas','Celulares e cartões','Carros e aviões','Somente papel'],a:0},
+{q:'Em qual região surgiram as primeiras moedas parecidas com as que conhecemos hoje?',o:['Brasil','Portugal','Lídia, região da atual Turquia','Holanda'],a:2},
+{q:'Quais metais eram utilizados nas primeiras moedas citadas no texto?',o:['Ferro e alumínio','Ouro e prata','Plástico e cobre','Madeira e prata'],a:1},
+{q:'Por que o uso das moedas facilitou o comércio entre as pessoas?',o:['Porque acabou com todos os impostos','Porque ajudou a estabelecer valores e facilitou compras e trocas','Porque impediu o transporte','Porque substituiu todos os produtos'],a:1},
+{q:'Qual é a diferença entre comércio formal e comércio informal?',o:['Não existe diferença','O formal é regulado por leis; o informal não oferece os mesmos direitos','O informal só existe na internet','O formal só ocorre em feiras'],a:1},
+{q:'Qual é um exemplo de comércio formal?',o:['Loja ou supermercado','Vendedor ambulante sem vínculo formal','Troca entre amigos','Escambo'],a:0},
+{q:'O que é comércio on-line?',o:['Venda apenas em feiras','Compra e venda pela internet','Troca sem dinheiro','Venda somente em portos'],a:1},
+{q:'Qual atitude faz parte do consumo consciente?',o:['Comprar sem necessidade','Jogar fora o que pode ser consertado','Doar roupas que não usamos mais','Escolher sempre mais embalagens'],a:2},
+{q:'O que significa consumo consciente?',o:['Comprar o máximo possível','Comprar, usar e descartar com responsabilidade','Nunca comprar nada','Jogar tudo fora'],a:1},
+{q:'Por que consertar um brinquedo antes de comprar outro é consumo consciente?',o:['Porque aumenta a vida útil e evita desperdício','Porque quebra mais rápido','Porque gera mais lixo','Porque sempre custa mais'],a:0},
+{q:'O que fazer com roupas, brinquedos e livros em bom estado que não usamos mais?',o:['Queimar','Doar ou reutilizar','Jogar em qualquer lugar','Guardar para sempre'],a:1},
+{q:'Por que o comércio colonial foi injusto para indígenas e africanos escravizados?',o:['Porque recebiam todos os lucros','Porque eram explorados e submetidos ao trabalho forçado','Porque controlavam Portugal','Porque não havia produção'],a:1},
+{q:'Como funcionava o comércio do açúcar até a Europa?',o:['Era produzido nos engenhos, levado aos portos e transportado em navios','Era produzido na Europa e enviado ao Brasil','Era transportado somente por cavalos até a Europa','Não era vendido na Europa'],a:0},
+{q:'Qual diferença existe entre o comércio do passado e o atual?',o:['Hoje existem dinheiro, cartões, Pix e internet; no passado havia mais escambo e moedas de troca','Não existe diferença','No passado havia comércio on-line','Hoje não usamos dinheiro'],a:0},
+{q:'Página 7 — A troca direta de produtos, sem o uso de dinheiro, é chamada de:',o:['Escambo','Comércio formal','Refino','Mascate'],a:0},
+{q:'Página 7 — Entre os primeiros bens usados como forma de pagamento estavam:',o:['Sal, conchas e metais','Celulares, cartões e Pix','Somente dinheiro de papel','Somente cartões'],a:0},
+{q:'Página 7 — Um dos primeiros povos a usar moedas foram os habitantes da:',o:['Lídia','Holanda','Brasil','Índia'],a:0},
+{q:'Página 7 — Qual é a principal diferença entre o escambo e o uso do dinheiro?',o:['No escambo há troca direta de produtos; com dinheiro usa-se um meio de pagamento','São exatamente iguais','O escambo usa cartão','O dinheiro só existia em feiras'],a:0},
+{q:'Página 10 — Os únicos produtos transportados pela Rota da Seda eram tecidos de seda.',o:['Verdadeiro','Falso','Somente entre 1300 e 1500','Não havia produtos'],a:1},
+{q:'Página 10 — Por meio da Rota da Seda, diferentes povos trocaram ideias e conheceram culturas novas.',o:['Verdadeiro','Falso','Somente produtos eram trocados','A rota não ligava povos'],a:0},
+{q:'Página 10 — A Rota da Seda passava apenas por mares e oceanos.',o:['Verdadeiro','Falso','Somente por desertos','Somente por rios'],a:1},
+{q:'Página 10 — Como a busca por novas rotas comerciais contribuiu para o início das Grandes Navegações?',o:['Levou europeus a investir em rotas marítimas e navegação','Fez o comércio acabar','Impediu o uso de navios','Eliminou o interesse por especiarias'],a:0},
+{q:'Página 10 — Por que a Rota da Seda era importante para pessoas da Europa e da Ásia?',o:['Porque permitia trocar mercadorias, ideias e conhecimentos','Porque servia somente para guerras','Porque era usada só para turismo','Porque não havia comércio'],a:0},
+{q:'Página 10 — Que conhecimentos eram compartilhados pela Rota da Seda?',o:['Matemática, Astronomia e Medicina','Somente culinária','Somente agricultura','Nenhum conhecimento'],a:0},
+{q:'Página 12 — O que era transportado pela Rota da Seda?',o:['Seda, porcelanas e especiarias','Somente açúcar','Somente pau-brasil','Somente sal'],a:0},
+{q:'Página 12 — Por que sal e cacau eram considerados valiosos?',o:['O sal conservava alimentos e o cacau era usado como alimento e em cerimônias','Porque eram feitos de ouro','Porque eram moedas de papel','Porque só existiam na Europa'],a:0},
+{q:'Página 14 — Quando você sai para fazer compras, quais produtos pode escolher?',o:['Alimentos e produtos de limpeza','Somente moedas antigas','Somente pau-brasil','Somente especiarias antigas'],a:0},
+{q:'Página 14 — Qual é um exemplo de estabelecimento comercial?',o:['Supermercado','Engenho colonial','Rota da Seda','Lídia'],a:0},
+{q:'Página 14 — Em uma feira, qual é a diferença entre comerciante e cliente?',o:['O comerciante oferece produtos e o cliente compra','O cliente vende e o comerciante sempre compra','Ambos são moedas','Não existe diferença'],a:0},
+{q:'Página 17 — Qual associação está correta?',o:['Pau-brasil — madeira usada para produzir tinta vermelha','Portugal — povo explorado como força de trabalho','Povos indígenas — controlavam os lucros','Escambo — moeda de ouro'],a:0},
+{q:'Página 17 — Por que o comércio entre indígenas e portugueses era injusto?',o:['Os indígenas trabalhavam e recebiam objetos de valor muito menor','Os indígenas ficavam com todo o lucro','Não havia extração de madeira','Portugal não recebia nada'],a:0},
+{q:'Página 17 — Por que a cana-de-açúcar se tornou importante?',o:['O clima quente e úmido e o solo favoreciam o cultivo, e o açúcar era lucrativo','Porque só crescia na neve','Porque não era vendida','Porque substituiu todos os outros alimentos'],a:0},
+{q:'Página 17 — Como o açúcar chegava à Europa?',o:['Era levado aos portos e depois transportado em navios','Era enviado por avião','Era levado apenas a pé','Era produzido diretamente na Europa'],a:0},
+{q:'Página 17 — Quem trabalhava nas plantações e engenhos e em quais condições?',o:['Povos africanos escravizados e outros trabalhadores forçados, em condições de violência e exploração','Somente reis, em boas condições','Somente comerciantes livres','Somente holandeses'],a:0},
+{q:'Página 20 — Qual associação está correta?',o:['Comércio formal — lojas e shoppings regulados por leis','Comércio informal — somente bancos','Comércio on-line — apenas feiras','Comércio formal — sem direitos trabalhistas'],a:0},
+{q:'Página 20 — Qual é uma dificuldade do trabalho informal?',o:['Não ter os mesmos direitos e proteções do trabalho formal','Receber automaticamente mais direitos','Ser obrigatório trabalhar em shopping','Não poder vender em feiras'],a:0},
+{q:'Página 20 — Qual atitude faz parte do consumo consciente?',o:['Separar o lixo reciclável corretamente','Escolher sempre mais embalagem','Jogar fora o que pode ser consertado','Comprar sem necessidade'],a:0},
+{q:'Página 20 — Por que pensar no ciclo de vida de um produto é importante?',o:['Porque ajuda a reduzir desperdício e impactos ambientais','Porque aumenta o lixo','Porque impede a reutilização','Porque obriga a comprar mais'],a:0},
+{q:'Página 22 — Por que a relação comercial entre Portugal e Brasil colonial era injusta?',o:['Porque Portugal controlava o comércio e concentrava grande parte da riqueza','Porque o Brasil recebia todos os lucros','Porque não havia trabalho forçado','Porque Portugal não comercializava produtos'],a:0},
+{q:'Página 22 — Quais caminhos eram usados para transportar mercadorias?',o:['Trilhas, rios, caminhos terrestres e rotas marítimas','Somente aviões','Somente metrôs','Somente ferrovias modernas'],a:0},
+{q:'Página 22 — Por que o comércio do açúcar dependia da parceria entre portugueses e holandeses?',o:['Portugal produzia no Brasil e os holandeses ajudavam no transporte, refino e venda','Os holandeses plantavam todo o açúcar sozinhos','Portugal não produzia açúcar','O açúcar não era vendido na Europa'],a:0}
+];
+let qs=[...ALL],idx=0,hits=0,misses=0,answered=false,wrong=[];const $=id=>document.getElementById(id);
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}
+function start(set){qs=[...(set||ALL)];idx=0;hits=0;misses=0;wrong=[];answered=false;$('quiz').classList.remove('hidden');$('result').classList.add('hidden');document.querySelector('.hero').classList.add('hidden');render()}
+function render(){if(idx>=qs.length)return finish();answered=false;$('nextBtn').disabled=true;$('feedback').textContent='';$('num').textContent=(idx+1)+' / '+qs.length;$('hits').textContent=hits;$('misses').textContent=misses;$('bar').style.width=(idx/qs.length*100)+'%';const item=qs[idx];$('q').textContent=item.q;const box=$('opts');box.innerHTML='';item.o.forEach((t,i)=>{const b=document.createElement('button');b.className='option';b.textContent=String.fromCharCode(65+i)+') '+t;b.addEventListener('click',()=>choose(i,b));box.appendChild(b)})}
+function choose(i,b){if(answered)return;answered=true;const item=qs[idx];const buttons=[...$('opts').children];buttons.forEach(x=>x.disabled=true);if(i===item.a){hits++;b.classList.add('correct');$('feedback').textContent='Muito bem! Resposta correta.'}else{misses++;wrong.push(item);b.classList.add('wrong');buttons[item.a].classList.add('correct');$('feedback').textContent='Resposta correta: '+item.o[item.a]}$('hits').textContent=hits;$('misses').textContent=misses;$('nextBtn').disabled=false;$('bar').style.width=((idx+1)/qs.length*100)+'%'}
+function finish(){$('quiz').classList.add('hidden');$('result').classList.remove('hidden');$('finalHits').textContent=hits;$('finalMisses').textContent=misses;const p=Math.round(hits/qs.length*100);$('finalPercent').textContent=p+'%';const name=$('name').value.trim();$('studentLine').textContent=name?'Aluno: '+name:'';$('finalMsg').textContent=p>=90?'Excelente! Você dominou o conteúdo.':p>=70?'Muito bom! Revise as que errou para ficar ainda melhor.':p>=50?'Bom começo. Vale revisar os pontos em que errou.':'Vamos revisar o conteúdo e tentar novamente.';$('wrongOnlyBtn').disabled=wrong.length===0}
+$('startBtn').addEventListener('click',()=>start());$('shuffleBtn').addEventListener('click',()=>{shuffle(ALL);$('shuffleBtn').textContent='Perguntas embaralhadas ✓'});$('nextBtn').addEventListener('click',()=>{if(answered){idx++;render()}});$('restartBtn').addEventListener('click',()=>start(qs));$('againBtn').addEventListener('click',()=>start());$('wrongOnlyBtn').addEventListener('click',()=>{if(wrong.length)start(wrong)});
+</script>
+</body>
+</html>
